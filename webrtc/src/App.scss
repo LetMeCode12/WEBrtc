@@ -24,6 +24,16 @@
         left: 50%;
         transform: translate(-50%, -50%);
         width: 100%;
+        .noCall {
+          position: absolute;
+          height: 70vh;
+          background-color: black;
+          z-index: 99;
+          left: 0;
+          border: solid 1px;
+          box-shadow: 0 0 10px 1px black;
+          width: 100%;
+        }
         #InnerVideo {
           position: absolute;
           bottom: 0;
@@ -31,13 +41,29 @@
           right: 0;
           max-width: 25vw;
           max-height: 20vh;
+          padding: 6px 0;
         }
         #OuterVideo {
           position: relative;
           z-index: 1;
           width: 100%;
           left: 0;
-          bottom: -5px;
+          border: solid 1px;
+          box-shadow: 0 0 10px 1px black;
+          height: 70vh;
+          background-color: black;
+        }
+        .VideoMenu {
+          position: absolute;
+          z-index: 2;
+          margin: 0 auto;
+          background-color: rgba(0, 0, 0, 0.308);
+          border: solid 1px;
+          border-radius: 20px;
+          bottom: 50px;
+          left: 50%;
+          transform: translate(-50%, 0);
+          padding: 10px;
         }
       }
     }

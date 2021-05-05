@@ -8,10 +8,10 @@ class App extends Component {
     this.state = {
       userId: undefined,
       isAlreadyCalling: false,
+      isCalling: false,
       users: [],
     };
-    this.intervalGetUsers = undefined;
-    this.peer = new RTCPeerConnection();
+    this.peer = undefined;
     this.outerVideo = createRef();
     this.innerViedo = createRef();
     this.socket = socketIOClient("http://localhost:8000").connect();
@@ -23,13 +23,16 @@ class App extends Component {
 
   findSocket = (data) => {
     const { users } = this.state;
-    console.log("XD",users,data)
+    console.log("XD", users, data);
     console.log("Users:", users.filter((e) => e.userId === +data)[0]?.socketId);
     return users.filter((e) => e.userId === +data)[0]?.socketId;
   };
 
   callUser = async (socketId) => {
     // console.log("pir:", this.peer.connectionState);
+    if (!this.peer) {
+      this.peer = new RTCPeerConnection();
+    }
     try {
       const offer = await this.peer.createOffer();
       await this.peer.setLocalDescription(new RTCSessionDescription(offer));
@@ -37,6 +40,10 @@ class App extends Component {
       await this.socket.emit("call-user", {
         offer,
         to: socketId,
+      });
+      this.setState({
+        isCalling: socketId,
+        isAlreadyCalling: true,
       });
     } catch (e) {
       console.error(e);
@@ -103,12 +110,18 @@ class App extends Component {
   onCallMade = () => {
     this.socket.on("call-made", async (data) => {
       // alert("Tu bedzie odbieranie");
+      console.log("Answe!:", !this.peer);
+      if (!this.peer) {
+        this.peer = new RTCPeerConnection();
+      }
       await this.peer.setRemoteDescription(
         new RTCSessionDescription(data.offer)
       );
       const answer = await this.peer.createAnswer();
       await this.peer.setLocalDescription(new RTCSessionDescription(answer));
-      console.log("Answe!");
+      this.setState({
+        isCalling: data.socket,
+      });
       this.socket.emit("make-answer", {
         answer,
         to: data.socket,
@@ -120,7 +133,6 @@ class App extends Component {
     const { userId } = this.state;
     this.socket.id = userId;
     this.socket.emit("user-connected", { userId: userId });
-    console.log("soket", this.socket);
   };
 
   getUsers = () => {
@@ -137,34 +149,65 @@ class App extends Component {
     });
   };
 
+  onRejectMade = () => {
+    this.socket.on("reject-made", () => {
+      this.onRemoveStream();
+    });
+  };
+
+  onUserUpdate = () => {
+    this.socket.on("user-update", (data) => {
+      this.setState({
+        users: data,
+      });
+    });
+  };
+
   async componentDidMount() {
     await this.setState({
       userId: this.renderPeer(),
     });
     this.onUserConnected();
     this.innerVideoRec();
-    this.outerVideoRec();
     this.onCallMade();
     this.onAnswerMade();
     this._getUsers();
     this.getUsers();
-    this.intervalGetUsers = setInterval(this.getUsers, 5000);
+    this.onRejectMade();
+    this.onUserUpdate();
   }
 
-  componentWillUnmount() {
-    clearInterval(this.intervalGetUsers);
+  componentDidUpdate(prevProps, prevState) {
+    const { isCalling } = this.state;
+    if (prevState.isCalling !== isCalling) {
+      if (isCalling) {
+        this.outerVideoRec();
+        this.innerVideoRec();
+      }
+    }
   }
 
-  // onRemoveStream = () => {
-  //   this.peer.removeTrack(this.sender);
-  //   this.peer.close();
-  //   this.setState({
-  //     isAlreadyCalling: false,
-  //   });
-  // };
+  onRemoveStream = () => {
+    if (this.peer) {
+      this.peer.close();
+      this.RejectStream();
+      this.setState({
+        isAlreadyCalling: false,
+        isCalling: false,
+      });
+      this.peer = undefined;
+    }
+  };
+
+  RejectStream = () => {
+    const { isCalling } = this.state;
+    this.socket.emit("reject-user", {
+      to: isCalling,
+    });
+  };
 
   render() {
-    const { userId, users } = this.state;
+    const { userId, users, isCalling } = this.state;
     return (
       <div className="App">
         <div className="Center">
@@ -178,12 +221,14 @@ class App extends Component {
             >
               Click
             </button>
-            {/* <button onClick={() => this.onRemoveStream()}>reject</button> */}
+            <button onClick={() => this.onRemoveStream()}>reject</button>
           </div>
           <div className="VideoChat">
             <div className="StreamView">
-              <video id="InnerVideo" ref={this.innerViedo} />
+              {!isCalling && <div className="noCall"></div>}
               <video id="OuterVideo" ref={this.outerVideo} />
+              <video id="InnerVideo" ref={this.innerViedo} />
+              <div className="VideoMenu">menu</div>
             </div>
           </div>
           <div className="Friends">
