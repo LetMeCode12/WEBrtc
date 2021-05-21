@@ -1,5 +1,6 @@
 const db = require("../index");
 const User = db.db.users;
+const Friend = db.db.friends;
 const { v4 } = require("uuid");
 const UserModel = require("../Models/UserModel");
 //https://bezkoder.com/node-js-express-sequelize-mysql/
@@ -23,9 +24,13 @@ exports.create = (req, res) => {
     name: req.body.name,
     surrname: req.body.surrname,
     email: req.body.email,
+    Friends: [
+      { id: v4(), friend: v4() },
+      { id: v4(), friend: v4() },
+    ],
   };
 
-  User.create(user)
+  User.create(user, { include: Friend })
     .then((data) => {
       res.send(data);
     })
@@ -36,15 +41,20 @@ exports.create = (req, res) => {
     });
 };
 
+exports.addFriend = (req, res) => {
+  const id = req.params.id
+  // User.update({Friends:})
+};
+
 exports.getAll = (req, res) => {
-    User.findAll()
-    .then(data => {
+  User.findAll({ include: [{ model: Friend }] })
+    .then((data) => {
       res.json(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving tutorials."
+          err.message || "Some error occurred while retrieving tutorials.",
       });
     });
-}
+};

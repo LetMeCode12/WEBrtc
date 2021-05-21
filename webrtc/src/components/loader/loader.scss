@@ -1,0 +1,18 @@
+.Loader {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--background);
+  .Load {
+    width: 10vw;
+    animation: spin infinite 2s linear;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

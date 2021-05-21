@@ -1,0 +1,8 @@
+.Video {
+  .Center {
+    display: grid;
+    grid-template-columns: 0.4fr 1fr 0.35fr;
+    height: 100vh;
+    background-color: var(--background);
+  }
+}

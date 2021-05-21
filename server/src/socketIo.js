@@ -15,7 +15,6 @@ const socketIo = (io) => {
     });
 
     socket.on("call-user", (data) => {
-      console.log("Wywolaneod:", data.to);
       socket.to(data.to).emit("call-made", {
         offer: data.offer,
         socket: socket.id,
@@ -23,7 +22,6 @@ const socketIo = (io) => {
     });
 
     socket.on("reject-user", (data) => {
-      console.log("Wywolaneod:", data.to);
       socket.to(data.to).emit("reject-made");
     });
 
@@ -36,7 +34,6 @@ const socketIo = (io) => {
 
     socket.on("disconnect", () => {
       users = [...users.filter((e) => e.socketId !== socket.id)];
-      console.log("users:", users);
       io.sockets.emit("user-update", users);
     });
   });
