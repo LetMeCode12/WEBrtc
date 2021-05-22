@@ -8,7 +8,7 @@ const io = new Server(server, { cors: { origins: ["*"] } });
 const { socketIo } = require("./socketIo");
 const cors = require("cors");
 const db = require("./sequelize/index");
-const { encode, compare } = require("./security/securityUtils");
+const security = require("./security/security")
 require("dotenv").config();
 
 const port = process.env.PORT;
@@ -17,10 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-encode("agaciakupu").then(async(hash) => {
-  console.log("hash:", hash);
-  console.log("compare:",await compare("agaciakupu",hash))
-});
+security(app);
 
 socketIo(io);
 

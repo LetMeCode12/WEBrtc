@@ -2,9 +2,9 @@ const db = require("../index");
 const User = db.db.users;
 const Friend = db.db.friends;
 const { v4 } = require("uuid");
-const UserModel = require("../Models/UserModel");
+const { encode } = require("../../security/securityUtils");
 //https://bezkoder.com/node-js-express-sequelize-mysql/
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   const requiredFields = ["login", "password", "name", "surrname", "email"];
 
   if (
@@ -20,7 +20,7 @@ exports.create = (req, res) => {
   const user = {
     id: v4(),
     login: req.body.login,
-    password: req.body.password,
+    password: await encode(req.body.password),
     name: req.body.name,
     surrname: req.body.surrname,
     email: req.body.email,
@@ -42,7 +42,7 @@ exports.create = (req, res) => {
 };
 
 exports.addFriend = (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
   // User.update({Friends:})
 };
 
@@ -53,8 +53,14 @@ exports.getAll = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving tutorials.",
+        message: err.message || "Some error occurred",
       });
     });
+};
+
+exports.getByLogin = async (login) => {
+  return await User.findAll({
+    where: { login: login },
+    include: [{ model: Friend }],
+  });
 };
