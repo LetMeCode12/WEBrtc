@@ -11,7 +11,7 @@ const refreshTokens = new nodeCache({
 module.exports = (app) => {
   app.post("/login", async (req, res) => {
     const { login, password } = req.body;
-    if (await compare(login, password)) {
+    if (await compare(login, password,res)) {
       const authToken = generateToken(login);
       const refreshToken = JWT.sign(
         { username: login },

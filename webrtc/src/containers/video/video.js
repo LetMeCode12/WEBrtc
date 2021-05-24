@@ -17,7 +17,7 @@ class Video extends Component {
     this.peer = undefined;
     this.outerVideo = createRef();
     this.innerViedo = createRef();
-    this.socket = socketIOClient("http://localhost:8000").connect();
+    this.socket = socketIOClient(process.env.REACT_APP_URL).connect();
   }
 
   renderPeer = () => {

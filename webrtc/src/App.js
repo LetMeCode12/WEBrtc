@@ -3,6 +3,7 @@ import { HashRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.scss";
 import Loader from "./components/loader/loader";
 
+const Login = lazy(() => import("./containers/login/login"));
 const Video = lazy(() => import("./containers/video/video"));
 const Test = lazy(() => new Promise(res=>setTimeout(() => res(import("./containers/video/video")),10000000000000000)))
 
@@ -13,7 +14,7 @@ class App extends Component {
         <Suspense fallback={<Loader />}>
           <Router>
             <Switch>
-              <Route path="/" exact />
+              <Route path="/" exact component={(props) => <Login {...props} />} />
               <Route
                 path="/video"
                 component={(props) => <Video {...props} />}
