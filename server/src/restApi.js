@@ -4,8 +4,17 @@ const fs = require("fs");
 const { authenticationToken } = require("./security/jwt");
 
 const restApi = (app) => {
-  app.get("/", (req, res) => {
-    res.send("<h1>Hello World!</h1>");
+  app.get("/", authenticationToken, async (req, res) => {
+    const { user } = req;
+    const _user = await UserController.getByLogin(user.username);
+    res.json({ user: { ..._user[0].dataValues, Friends:_user[0].dataValues.Friends.map(e=>e.friend),password:undefined  }});
+  });
+
+  app.post("/findById", authenticationToken, async (req, res) => {
+    const { id } = req.body;
+    if (!id || id?.length <= 0) return res.status(400).send("Login is empty");
+    const users = await UserController.getById(id);
+    res.json({ users: users });
   });
 
   app.get("/users",authenticationToken, UserController.getAll);

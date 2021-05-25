@@ -62,5 +62,13 @@ exports.getByLogin = async (login) => {
   return await User.findAll({
     where: { login: login },
     include: [{ model: Friend }],
+    attributes: ["id","login","name",'password'],
+  });
+};
+
+exports.getById = async (id) => {
+  return await User.findAll({
+    where: { id: id },
+    attributes: ["id", "login", "name"],
   });
 };

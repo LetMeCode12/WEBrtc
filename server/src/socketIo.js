@@ -5,7 +5,7 @@ const socketIo = (io) => {
     socket.on("user-connected", (data) => {
       users = [
         ...users.filter((e) => e.userId !== data.userId),
-        { userId: data.userId, socketId: socket.id },
+        { userId: data.userId, socketId: socket.id, login:data.login },
       ];
       io.sockets.emit("user-update", users);
     });

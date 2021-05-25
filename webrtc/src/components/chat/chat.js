@@ -1,4 +1,4 @@
-import React, { Component, createRef } from "react";
+import React, { Component } from "react";
 import "./chat.scss";
 
 class Chat extends Component {

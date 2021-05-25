@@ -5,7 +5,8 @@ import Loader from "./components/loader/loader";
 
 const Login = lazy(() => import("./containers/login/login"));
 const Video = lazy(() => import("./containers/video/video"));
-const Test = lazy(() => new Promise(res=>setTimeout(() => res(import("./containers/video/video")),10000000000000000)))
+const AuthRoute = lazy(() => import("./components/authRoute/authRoute"));
+
 
 class App extends Component {
   render() {
@@ -14,14 +15,14 @@ class App extends Component {
         <Suspense fallback={<Loader />}>
           <Router>
             <Switch>
-              <Route path="/" exact component={(props) => <Login {...props} />} />
-              <Route
-                path="/video"
+              <AuthRoute
+                exact
+                path="/"
                 component={(props) => <Video {...props} />}
               />
               <Route
-                path="/test"
-                component={(props) => <Test {...props} />}
+                path="/login"
+                component={(props) => <Login {...props} />}
               />
             </Switch>
           </Router>

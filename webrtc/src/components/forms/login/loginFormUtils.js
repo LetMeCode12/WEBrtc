@@ -33,14 +33,14 @@ export const submit = (values, dispatch, props) => {
       return res.json();
     })
     .then((data) => {
-      localStorage.setItem("token", data.auth);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("token", "Bearer " + data.auth);
+      localStorage.setItem("refreshToken", "Bearer " + data.refreshToken);
       dispatch(reSetError);
-      history.push("/video");
+      history.push("/");
     })
     .catch((err) => {
       console.error(err);
-    //   dispatch(setError("Logowanie nie powiodło się"));
+      //   dispatch(setError("Logowanie nie powiodło się"));
     });
 };
 

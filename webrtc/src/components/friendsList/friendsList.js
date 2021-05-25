@@ -3,20 +3,23 @@ import "./friendsList.scss";
 
 class FriendsList extends Component {
   render() {
-    const { users, userId, findSocket, callUser, onRemoveStream } = this.props;
+    const { users, user, findSocket, callUser, onRemoveStream } = this.props;
     return (
       <div className="Friends">
-        {users && users?.map((user) => <div>{user?.userId}</div>)}
-            <p>User id:{userId }</p>
-        <input ref={(reff) => (this.myInput = reff)} />
-        <button
-          onClick={() => {
-            callUser(findSocket(this.myInput.value));
-          }}
-        >
-          Click
-        </button>
-        <button onClick={() => onRemoveStream()}>reject</button>
+        {users &&
+          users?.filter(e=>e.userId!==user.id)?.map((user, index) => (
+            <div>
+              {index}: {user?.login}
+              <button
+                onClick={() => {
+                  callUser(findSocket(user?.userId));
+                }}
+              >
+                Call
+              </button>
+            </div>
+          ))}
+        <p>Login: {user.login}</p>
       </div>
     );
   }

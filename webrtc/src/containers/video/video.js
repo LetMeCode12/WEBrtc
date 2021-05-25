@@ -4,35 +4,30 @@ import Chat from "../../components/chat/chat";
 import VideoChat from "../../components/video/videoChat";
 import FriendsList from "../../components/friendsList/friendsList";
 import socketIOClient from "socket.io-client";
+import { connect } from "react-redux";
 
 class Video extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userId: undefined,
       isAlreadyCalling: false,
       isCalling: false,
       users: [],
+      isMute: false,
     };
     this.peer = undefined;
+    this.myStream = undefined;
     this.outerVideo = createRef();
     this.innerViedo = createRef();
     this.socket = socketIOClient(process.env.REACT_APP_URL).connect();
   }
 
-  renderPeer = () => {
-    return Math.floor(Math.random() * 10) + 1;
-  };
-
   findSocket = (data) => {
     const { users } = this.state;
-    console.log("XD", users, data);
-    console.log("Users:", users.filter((e) => e.userId === +data)[0]?.socketId);
-    return users.filter((e) => e.userId === +data)[0]?.socketId;
+    return users.filter((e) => e.userId === data)[0]?.socketId;
   };
 
   callUser = async (socketId) => {
-    // console.log("pir:", this.peer.connectionState);
     if (!this.peer) {
       this.peer = new RTCPeerConnection();
     }
@@ -57,17 +52,18 @@ class Video extends Component {
     navigator.getUserMedia(
       { video: true, audio: true },
       (stream) => {
+        this.myStream = stream;
         const localVideo = this.innerViedo.current;
         if (localVideo) {
-          localVideo.srcObject = stream;
+          localVideo.srcObject = this.myStream;
           localVideo.onloadedmetadata = () => {
             localVideo.muted = true;
             localVideo.play();
           };
         }
         if (this.peer) {
-          stream.getTracks().forEach((track) => {
-            this.sender = this.peer.addTrack(track, stream);
+          this.myStream.getTracks().forEach((track) => {
+            this.peer.addTrack(track, this.myStream);
           });
         }
       },
@@ -113,7 +109,6 @@ class Video extends Component {
   onCallMade = () => {
     this.socket.on("call-made", async (data) => {
       // alert("Tu bedzie odbieranie");
-      console.log("Answe!:", !this.peer);
       if (!this.peer) {
         this.peer = new RTCPeerConnection();
       }
@@ -133,9 +128,8 @@ class Video extends Component {
   };
 
   onUserConnected = () => {
-    const { userId } = this.state;
-    this.socket.id = userId;
-    this.socket.emit("user-connected", { userId: userId });
+    const { id, login } = this.props.user;
+    this.socket.emit("user-connected", { userId: id, login: login });
   };
 
   getUsers = () => {
@@ -144,9 +138,11 @@ class Video extends Component {
 
   _getUsers = () => {
     this.socket.on("send-users", (data) => {
-      console.log("onlineUsers:", data);
+      const { users } = data;
+      console.log("onlineUsers:", users);
+
       this.setState({
-        users: [...data.users],//tu dispatch z redux 
+        users: [...users],
       });
     });
   };
@@ -166,10 +162,6 @@ class Video extends Component {
   };
 
   async componentDidMount() {
-    await this.setState({
-      userId: this.renderPeer(),
-    });
-    this.onUserConnected();
     this.innerVideoRec();
     this.onCallMade();
     this.onAnswerMade();
@@ -179,13 +171,17 @@ class Video extends Component {
     this.onUserUpdate();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     const { isCalling } = this.state;
     if (prevState.isCalling !== isCalling) {
       if (isCalling) {
         this.outerVideoRec();
         this.innerVideoRec();
       }
+    }
+    if (prevProps.user !== this.props.user) {
+      await this.onUserConnected();
+      await this.getUsers();
     }
   }
 
@@ -206,6 +202,11 @@ class Video extends Component {
     this.socket.emit("reject-user", {
       to: isCalling,
     });
+    this.myStream.getTracks().forEach(function (track) {
+      if (track.readyState == "live") {
+        track.stop();
+      }
+    });
   };
 
   render() {
@@ -217,12 +218,21 @@ class Video extends Component {
             outerVideo={this.outerVideo}
             innerViedo={this.innerViedo}
             isCalling={this.state.isCalling}
+            myStream={this.myStream}
+            onRemoveStream={this.onRemoveStream}
           />
-          <FriendsList users={this.state.users} userId={this.state.userId} findSocket={this.findSocket} callUser={this.callUser} onRemoveStream={this.onRemoveStream} />
+          <FriendsList
+            users={this.state.users}
+            user={this.props.user}
+            findSocket={this.findSocket}
+            callUser={this.callUser}
+          />
         </div>
       </div>
     );
   }
 }
 
-export default Video;
+export default connect((state) => ({
+  user: state.UserReducer.user,
+}))(Video);

@@ -9,16 +9,17 @@ import { Alert } from "reactstrap";
 import camera from "../../../icons/camera.svg";
 import { connect } from "react-redux";
 import { reSetError, reSetInfo } from "../../../redux/actions/loginAction";
+import { reSetUser } from "../../../redux/actions/userAction";
 
 const formName = "loginForm";
 
 class LoginForm extends Component {
-
-    componentDidMount() {
-        const { reSetError, reSetInfo } = this.props;
-        reSetError();
-        reSetInfo();
-    }
+  componentDidMount() {
+    const { reSetError, reSetInfo, reSetUser } = this.props;
+    reSetError();
+    reSetInfo();
+    reSetUser();
+  }
 
   render() {
     const { handleSubmit, error, info } = this.props;
@@ -77,6 +78,7 @@ export default compose(
     (dispatch) => ({
       reSetError: () => dispatch(reSetError),
       reSetInfo: () => dispatch(reSetInfo),
+      reSetUser: () => dispatch(reSetUser),
     })
   )
 )(LoginForm);
