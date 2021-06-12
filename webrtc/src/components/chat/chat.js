@@ -4,9 +4,8 @@ import "./chat.scss";
 class Chat extends Component {
   render() {
     return (
-          <div className="Chat">
-           
-          </div>
+      <div className="Chat">
+       </div>
     );
   }
 }

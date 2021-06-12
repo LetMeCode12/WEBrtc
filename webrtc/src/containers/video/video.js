@@ -162,7 +162,7 @@ class Video extends Component {
   };
 
   async componentDidMount() {
-    this.innerVideoRec();
+    // this.innerVideoRec();
     this.onCallMade();
     this.onAnswerMade();
     this._getUsers();
@@ -194,6 +194,9 @@ class Video extends Component {
         isCalling: false,
       });
       this.peer = undefined;
+      const vid = this.innerViedo.current
+      vid.pause();
+      vid.src = "";
     }
   };
 

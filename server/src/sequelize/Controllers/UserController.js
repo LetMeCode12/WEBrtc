@@ -16,7 +16,6 @@ exports.create = async (req, res) => {
     res.status(400).send("Wrong input data");
     return;
   }
-  // Create a Tutorial
   const user = {
     id: v4(),
     login: req.body.login,
@@ -24,13 +23,9 @@ exports.create = async (req, res) => {
     name: req.body.name,
     surrname: req.body.surrname,
     email: req.body.email,
-    Friends: [
-      { id: v4(), friend: v4() },
-      { id: v4(), friend: v4() },
-    ],
   };
 
-  User.create(user, { include: Friend })
+  User.create(user)
     .then((data) => {
       res.send(data);
     })
@@ -43,7 +38,7 @@ exports.create = async (req, res) => {
 
 exports.addFriend = (req, res) => {
   const id = req.params.id;
-  // User.update({Friends:})
+  // User.update({include:Friends})
 };
 
 exports.getAll = (req, res) => {

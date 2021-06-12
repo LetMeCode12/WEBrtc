@@ -3,7 +3,7 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const { restApi } = require("./restApi");
+const  restApi  = require("./restApi");
 const io = new Server(server, { cors: { origins: ["*"] } });
 const { socketIo } = require("./socketIo");
 const cors = require("cors");
@@ -21,7 +21,7 @@ security(app);
 
 socketIo(io);
 
-restApi(app);
+app.use('/',restApi);
 
 db.db.sequelize.sync();
 

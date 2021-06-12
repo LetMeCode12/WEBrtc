@@ -2,26 +2,31 @@ const UserController = require("./sequelize/Controllers/UserController");
 const multer = require("multer")();
 const fs = require("fs");
 const { authenticationToken } = require("./security/jwt");
+const router = require('express').Router()
 
-const restApi = (app) => {
-  app.get("/", authenticationToken, async (req, res) => {
+  router.get("/test", (req, res) => {
+      console.log("test:",req.query)
+  });
+
+
+  router.get("/", authenticationToken, async (req, res) => {
     const { user } = req;
     const _user = await UserController.getByLogin(user.username);
     res.json({ user: { ..._user[0].dataValues, Friends:_user[0].dataValues.Friends.map(e=>e.friend),password:undefined  }});
   });
 
-  app.post("/findById", authenticationToken, async (req, res) => {
+  router.post("/findById", authenticationToken, async (req, res) => {
     const { id } = req.body;
     if (!id || id?.length <= 0) return res.status(400).send("Login is empty");
     const users = await UserController.getById(id);
     res.json({ users: users });
   });
 
-  app.get("/users",authenticationToken, UserController.getAll);
+  router.get("/users",authenticationToken, UserController.getAll);
 
-  app.post("/user/register", UserController.create);
+  router.post("/user/register", UserController.create);
 
-  app.post("/user/image/save", multer.single("photo"), (req, res) => {
+  router.post("/user/image/save", multer.single("photo"), (req, res) => {
     if (req.body && req.file) {
       if (!["jpg", "png"].includes(req.file.originalname.split(".")[1])) {
         return res.status(500).send("Wrong type file");
@@ -43,8 +48,6 @@ const restApi = (app) => {
     }
     res.status(500).send();
   });
-};
 
-module.exports = {
-  restApi,
-};
+
+module.exports = router;

@@ -9,6 +9,10 @@ module.exports = (sequelize) => {
     },
     friend: {
       type: DataTypes.UUID,
+      allowNull: false,
     },
+    confirm: {
+      type: DataTypes.BOOLEAN
+    }
   });
 };
