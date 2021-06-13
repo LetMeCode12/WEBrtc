@@ -10,6 +10,10 @@ const socketIo = (io) => {
       io.sockets.emit("user-update", users);
     });
 
+    setInterval(() => {
+      io.sockets.emit("user-update", users);
+    },3000)
+
     socket.on("get-users", () => {
       socket.emit("send-users", { users: users });
     });

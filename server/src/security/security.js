@@ -2,14 +2,14 @@ const { compare } = require("./securityUtils");
 const JWT = require("jsonwebtoken");
 const nodeCache = require("node-cache");
 const { generateToken } = require("./jwt");
+const router = require('express').Router()
 
 const refreshTokens = new nodeCache({
   stdTTL: +process.env.REFRESH_TOKEN_EXPIRE,
   checkperiod: 120,
 });
 
-module.exports = (app) => {
-  app.post("/login", async (req, res) => {
+  router.post("/login", async (req, res) => {
     const { login, password } = req.body;
     if (await compare(login, password,res)) {
       const authToken = generateToken(login);
@@ -28,7 +28,7 @@ module.exports = (app) => {
     return res.status(401).send();
   });
 
-  app.post("/token", (req, res) => {
+  router.post("/token", (req, res) => {
     const _refreshToken = req.body.refreshToken;
     if (!_refreshToken) return res.status(401).send();
     if (!refreshTokens.keys().includes(_refreshToken))
@@ -49,4 +49,6 @@ module.exports = (app) => {
       return res.status(200).send("ok");
     });
   });
-};
+
+
+module.exports = router;

@@ -1,7 +1,14 @@
  .Chat {
-      border: 1px solid;
+      
       // margin: 0.5rem;
       // border-radius: 10px;
       // box-shadow: 0 0 5px black;
       background-color: rgb(255,255, 255);
+      width: 0px;
+      transition: all .5s linear;
+      overflow: hidden;
+      &.expand{
+        width: 20vw;
+        border: 1px solid;
+      }
     }
