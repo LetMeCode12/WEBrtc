@@ -22,7 +22,7 @@ const router = require('express').Router()
     res.json({ users: users });
   });
 
-  router.get("/users",authenticationToken, UserController.getAll);
+  router.get("/users",UserController.getAll);
 
   router.post("/user/register", UserController.create);
 

@@ -1,6 +1,6 @@
-const db = require("../index");
-const User = db.db.users;
-const Friend = db.db.friends;
+const User = require("../Models/UserModel")
+const Friends = require("../Models/FriendsModel")
+
 const { v4 } = require("uuid");
 const { encode } = require("../../security/securityUtils");
 //https://bezkoder.com/node-js-express-sequelize-mysql/
@@ -42,7 +42,7 @@ exports.addFriend = (req, res) => {
 };
 
 exports.getAll = (req, res) => {
-  User.findAll({ include: [{ model: Friend }] })
+  User.findAll({ include: [{ model: Friends }] })
     .then((data) => {
       res.json(data);
     })

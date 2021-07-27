@@ -1,7 +1,9 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes, Model, Sequelize } = require("sequelize");
 
-module.exports = (sequelize) => {
-    return sequelize.define("User", {
+
+class User extends Model {
+  static init(sequelize) {
+    return super.init({
       id: {
         allowNull: false,
         type: DataTypes.UUID,
@@ -25,5 +27,14 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         unique: true,
       },
-    });
+    }, { sequelize, modelName: "Users" })
+  }
+
+  static associate(models) {
+    this.hasMany(models.friends, { onDelete: "cascade", hooks: true });
+  }
+
 }
+
+module.exports = User
+

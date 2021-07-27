@@ -1,22 +1,17 @@
 const Sequelize = require("sequelize");
-const FriendsModel = require("./Models/FriendsModel");
-const UserModel = require("./Models/UserModel");
+const Friends = require("./Models/FriendsModel");
+const User = require("./Models/UserModel");
 
 const sequelize = new Sequelize(
   "postgres://postgres:admin@localhost:5432/WEBrtc"
 );
 
-const db = {};
+const models = {
+  users: User.init(sequelize),
+  friends: Friends.init(sequelize)
+}
 
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+Object.values(models).filter(model => typeof model.associate === "function")
+  .forEach(model => model.associate(models));
 
-db.users = UserModel(sequelize);
-db.friends = FriendsModel(sequelize);
-
-db.users.hasMany(db.friends, { onDelete: "cascade", hooks: true });
-db.friends.belongsTo(db.users);
-
-module.exports = {
-  db,
-};
+module.exports = sequelize;

@@ -7,8 +7,8 @@ const  restApi  = require("./restApi");
 const io = new Server(server, { cors: { origins: ["*"] } });
 const { socketIo } = require("./socketIo");
 const cors = require("cors");
-const db = require("./sequelize/index");
 const security = require("./security/security")
+const sequelize = require('./sequelize/index')
 require("dotenv").config();
 
 const port = process.env.PORT;
@@ -23,7 +23,7 @@ socketIo(io);
 
 app.use('/',restApi);
 
-db.db.sequelize.sync();
+sequelize.sync();
 
 server.listen(port, () => {
   console.log(`APP run at port: ${port}`);
