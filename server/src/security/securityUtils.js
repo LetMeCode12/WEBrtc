@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const UserController = require("../sequelize/Controllers/UserController");
+const UserController = require("../sequelize/Service/UserService");
 
 const encode = async (password) => {
   return await bcrypt.hashSync(password, +process.env.SALTROUNDS);

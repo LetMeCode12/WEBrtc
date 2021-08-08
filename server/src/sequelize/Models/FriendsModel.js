@@ -22,7 +22,6 @@ class Friends extends Model {
 
   static associate(models) {
     this.belongsTo(models.users);
-    
   }
  }
 
